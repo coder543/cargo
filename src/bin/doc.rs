@@ -16,6 +16,7 @@ pub struct Options {
     flag_no_deps: bool,
     flag_open: bool,
     flag_release: bool,
+    flag_debug: bool,
     flag_verbose: u32,
     flag_quiet: Option<bool>,
     flag_color: Option<String>,
@@ -48,6 +49,7 @@ Options:
     --bin NAME                   Document only the specified binary
     --bins                       Document all binaries
     --release                    Build artifacts in release mode, with optimizations
+    --debug                      Build artifacts in debug mode, with no optimizations
     --features FEATURES          Space-separated list of features to also build
     --all-features               Build all available features
     --no-default-features        Do not build the `default` feature
@@ -113,6 +115,7 @@ pub fn execute(options: Options, config: &mut Config) -> CliResult {
                                             false),
             message_format: options.flag_message_format,
             release: options.flag_release,
+            debug: options.flag_debug,
             mode: ops::CompileMode::Doc {
                 deps: !options.flag_no_deps,
             },

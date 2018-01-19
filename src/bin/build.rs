@@ -19,6 +19,7 @@ pub struct Options {
     flag_color: Option<String>,
     flag_message_format: MessageFormat,
     flag_release: bool,
+    flag_debug: bool,
     flag_lib: bool,
     flag_bin: Vec<String>,
     flag_bins: bool,
@@ -60,6 +61,7 @@ Options:
     --benches                    Build all benches
     --all-targets                Build all targets (lib and bin targets by default)
     --release                    Build artifacts in release mode, with optimizations
+    --debug                      Build artifacts in debug mode, with no optimizations
     --features FEATURES          Space-separated list of features to also build
     --all-features               Build all available features
     --no-default-features        Do not build the `default` feature
@@ -114,6 +116,7 @@ pub fn execute(options: Options, config: &mut Config) -> CliResult {
         spec: spec,
         mode: ops::CompileMode::Build,
         release: options.flag_release,
+        debug: options.flag_debug,
         filter: ops::CompileFilter::new(options.flag_lib,
                                         &options.flag_bin, options.flag_bins,
                                         &options.flag_test, options.flag_tests,

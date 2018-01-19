@@ -55,6 +55,8 @@ pub struct CompileOptions<'a> {
     pub filter: CompileFilter<'a>,
     /// Whether this is a release build or not
     pub release: bool,
+    /// Whether this is a debug build or not
+    pub debug: bool,
     /// Mode for this compile.
     pub mode: CompileMode,
     /// `--error_format` flag for the compiler.
@@ -79,6 +81,7 @@ impl<'a> CompileOptions<'a> {
             spec: ops::Packages::Packages(&[]),
             mode: mode,
             release: false,
+            debug: false,
             filter: CompileFilter::Default { required_features_filterable: false },
             message_format: MessageFormat::Human,
             target_rustdoc_args: None,
@@ -212,7 +215,7 @@ pub fn compile_ws<'a>(ws: &Workspace<'a>,
                       -> CargoResult<ops::Compilation<'a>> {
     let CompileOptions { config, jobs, target, spec, features,
                          all_features, no_default_features,
-                         release, mode, message_format,
+                         release, debug, mode, message_format,
                          ref filter,
                          ref target_rustdoc_args,
                          ref target_rustc_args } = *options;
@@ -259,7 +262,7 @@ pub fn compile_ws<'a>(ws: &Workspace<'a>,
             let all_features = resolve_all_features(&resolve_with_overrides,
                                                     to_builds[0].package_id());
             let targets = generate_targets(to_builds[0], profiles,
-                                           mode, filter, &all_features, release)?;
+                                           mode, filter, &all_features, release, debug)?;
             if targets.len() == 1 {
                 let (target, profile) = targets[0];
                 let mut profile = profile.clone();
@@ -275,7 +278,7 @@ pub fn compile_ws<'a>(ws: &Workspace<'a>,
             let all_features = resolve_all_features(&resolve_with_overrides,
                                                     to_builds[0].package_id());
             let targets = generate_targets(to_builds[0], profiles,
-                                           mode, filter, &all_features, release)?;
+                                           mode, filter, &all_features, release, debug)?;
             if targets.len() == 1 {
                 let (target, profile) = targets[0];
                 let mut profile = profile.clone();
@@ -292,7 +295,7 @@ pub fn compile_ws<'a>(ws: &Workspace<'a>,
                 let all_features = resolve_all_features(&resolve_with_overrides,
                                                         to_build.package_id());
                 let targets = generate_targets(to_build, profiles, mode,
-                                               filter, &all_features, release)?;
+                                               filter, &all_features, release, debug)?;
                 package_targets.push((to_build, targets));
             }
         }
@@ -604,9 +607,11 @@ fn generate_targets<'a>(pkg: &'a Package,
                         mode: CompileMode,
                         filter: &CompileFilter,
                         features: &HashSet<String>,
-                        release: bool)
+                        release: bool,
+                        debug: bool)
                         -> CargoResult<Vec<(&'a Target, &'a Profile)>> {
-    let build = if release {&profiles.release} else {&profiles.dev};
+    assert!(!(debug && release));
+    let build = if release {&profiles.release} else if debug {&profiles.debug} else {&profiles.dev};
     let test = if release {&profiles.bench} else {&profiles.test};
     let profile = match mode {
         CompileMode::Test => test,
@@ -636,7 +641,7 @@ fn generate_targets<'a>(pkg: &'a Package,
 
     let targets = match *filter {
         CompileFilter::Default { required_features_filterable } => {
-            let deps = if release {
+            let deps = if !debug {
                 &profiles.bench_deps
             } else {
                 &profiles.test_deps

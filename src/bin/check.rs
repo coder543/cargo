@@ -28,6 +28,7 @@ Options:
     --benches                    Check all benches
     --all-targets                Check all targets (lib and bin targets by default)
     --release                    Check artifacts in release mode, with optimizations
+    --debug                      Check artifacts in debug mode, without optimizations
     --profile PROFILE            Profile to build the selected target for
     --features FEATURES          Space-separated list of features to also check
     --all-features               Check all available features
@@ -73,6 +74,7 @@ pub struct Options {
     flag_color: Option<String>,
     flag_message_format: MessageFormat,
     flag_release: bool,
+    flag_debug: bool,
     flag_lib: bool,
     flag_bin: Vec<String>,
     flag_bins: bool,
@@ -130,6 +132,7 @@ pub fn execute(options: Options, config: &mut Config) -> CliResult {
         spec: spec,
         mode: ops::CompileMode::Check{test:test},
         release: options.flag_release,
+        debug: options.flag_debug,
         filter: ops::CompileFilter::new(options.flag_lib,
                                         &options.flag_bin, options.flag_bins,
                                         &options.flag_test, options.flag_tests,

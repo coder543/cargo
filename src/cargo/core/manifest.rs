@@ -179,12 +179,14 @@ pub struct Profile {
     pub panic: Option<String>,
     #[serde(skip_serializing)]
     pub incremental: bool,
+    pub optimize_deps: bool,
 }
 
 #[derive(Default, Clone, Debug, PartialEq, Eq)]
 pub struct Profiles {
     pub release: Profile,
     pub dev: Profile,
+    pub debug: Profile,
     pub test: Profile,
     pub test_deps: Profile,
     pub bench: Profile,
@@ -628,6 +630,17 @@ impl fmt::Display for Target {
 }
 
 impl Profile {
+    pub fn default_debug() -> Profile {
+        Profile {
+            debuginfo: Some(2),
+            debug_assertions: true,
+            overflow_checks: true,
+            incremental: true,
+            optimize_deps: false,
+            ..Profile::default()
+        }
+    }
+
     pub fn default_dev() -> Profile {
         Profile {
             debuginfo: Some(2),
@@ -716,6 +729,7 @@ impl Default for Profile {
             check: false,
             panic: None,
             incremental: false,
+            optimize_deps: true,
         }
     }
 }

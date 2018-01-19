@@ -600,6 +600,7 @@ impl<'cfg> Workspace<'cfg> {
             let default_profiles = Profiles {
                 release: Profile::default_release(),
                 dev: Profile::default_dev(),
+                debug: Profile::default_debug(),
                 test: Profile::default_test(),
                 test_deps: Profile::default_dev(),
                 bench: Profile::default_bench(),

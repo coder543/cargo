@@ -339,6 +339,8 @@ pub struct TomlProfile {
     #[serde(rename = "overflow-checks")]
     overflow_checks: Option<bool>,
     incremental: Option<bool>,
+    #[serde(rename = "optimize-deps")]
+    optimize_deps: Option<bool>,
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -1096,6 +1098,8 @@ fn build_profiles(profiles: &Option<TomlProfiles>) -> Profiles {
                        profiles.and_then(|p| p.release.as_ref())),
         dev: merge(Profile::default_dev(),
                    profiles.and_then(|p| p.dev.as_ref())),
+        debug: merge(Profile::default_debug(),
+                   profiles.and_then(|p| p.dev.as_ref())),
         test: merge(Profile::default_test(),
                     profiles.and_then(|p| p.test.as_ref())),
         test_deps: merge(Profile::default_dev(),
@@ -1124,7 +1128,7 @@ fn build_profiles(profiles: &Option<TomlProfiles>) -> Profiles {
     fn merge(profile: Profile, toml: Option<&TomlProfile>) -> Profile {
         let &TomlProfile {
             ref opt_level, lto, codegen_units, ref debug, debug_assertions, rpath,
-            ref panic, ref overflow_checks, ref incremental,
+            ref panic, ref overflow_checks, ref incremental, ref optimize_deps
         } = match toml {
             Some(toml) => toml,
             None => return profile,
@@ -1151,6 +1155,7 @@ fn build_profiles(profiles: &Option<TomlProfiles>) -> Profiles {
             check: profile.check,
             panic: panic.clone().or(profile.panic),
             incremental: incremental.unwrap_or(profile.incremental),
+            optimize_deps: optimize_deps.unwrap_or(profile.optimize_deps),
         }
     }
 }

@@ -147,7 +147,7 @@ impl<'a, 'cfg> Context<'a, 'cfg> {
                build_config: BuildConfig,
                profiles: &'a Profiles) -> CargoResult<Context<'a, 'cfg>> {
 
-        let dest = if build_config.release { "release" } else { "debug" };
+        let dest = if build_config.release { "release" } else if build_config.debug { "debug" } else { "dev" };
         let host_layout = Layout::new(ws, None, dest)?;
         let target_layout = match build_config.requested_target.as_ref() {
             Some(target) => Some(Layout::new(ws, Some(target), dest)?),

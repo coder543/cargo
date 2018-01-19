@@ -63,6 +63,8 @@ pub struct BuildConfig {
     pub jobs: u32,
     /// Whether we are building for release
     pub release: bool,
+    /// Whether we are building for debug
+    pub debug: bool,
     /// Whether we are running tests
     pub test: bool,
     /// Whether we are building documentation
@@ -746,7 +748,7 @@ fn build_base_args<'a, 'cfg>(cx: &mut Context<'a, 'cfg>,
     let Profile {
         ref opt_level, lto, codegen_units, ref rustc_args, debuginfo,
         debug_assertions, overflow_checks, rpath, test, doc: _doc,
-        run_custom_build, ref panic, rustdoc_args: _, check, incremental: _,
+        run_custom_build, ref panic, rustdoc_args: _, check, incremental: _, optimize_deps: _,
     } = *unit.profile;
     assert!(!run_custom_build);
 
